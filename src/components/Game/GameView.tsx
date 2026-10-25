@@ -1,7 +1,12 @@
+import adventurerImage from '../../assets/adventurer.svg'
+import entranceImage from '../../assets/dungeon-entrance.svg'
+import exitImage from '../../assets/dungeon-exit.svg'
+import monsterImage from '../../assets/monster.svg'
+import type { Monster } from '../../models/Monster'
+import wallImage from '../../assets/wall.avif'
 import type { Vector2 } from '../../models/Vector2'
 import type { Wall } from '../../models/Wall'
-import adventurerImage from '../../assets/adventurer.svg'
-import wallImage from '../../assets/wall.avif'
+import GameHud from './GameHud'
 import './Game.css'
 
 type GameViewProps = {
@@ -11,7 +16,9 @@ type GameViewProps = {
   walls: readonly Wall[]
   entrance: Vector2
   exit: Vector2
-  seed: number
+  monster: Monster | null
+  currentHealth: number
+  maxHealth: number
   roll: number | null
   onRoll: () => void
   onBack: () => void
@@ -24,7 +31,9 @@ function GameView({
   walls,
   entrance,
   exit,
-  seed,
+  monster,
+  currentHealth,
+  maxHealth,
   roll,
   onRoll,
   onBack,
@@ -33,8 +42,7 @@ function GameView({
 
   return (
     <section className="game-placeholder" aria-labelledby="game-title">
-      <h2 id="game-title">Game</h2>
-      <p>Game seed: {seed}</p>
+      <GameHud currentHealth={currentHealth} maxHealth={maxHealth} />
       <div
         className="game-grid"
         role="grid"
@@ -50,9 +58,13 @@ function GameView({
             const isWall = wallLocations.has(y * width + x)
             const isEntrance = entrance.x === x && entrance.y === y
             const isExit = exit.x === x && exit.y === y
+            const isMonster =
+              monster !== null &&
+              monster.location.x === x &&
+              monster.location.y === y
             return (
               <div
-                className={`game-cell${isAdventurer ? ' game-cell-adventurer' : ''}${isWall ? ' game-cell-wall' : ''}`}
+                className={`game-cell${isAdventurer ? ' game-cell-adventurer' : ''}${isWall ? ' game-cell-wall' : ''}${isMonster ? ' game-cell-monster' : ''}`}
                 role="gridcell"
                 aria-label={
                   isAdventurer
@@ -63,7 +75,9 @@ function GameView({
                         ? `Entrance at column ${x + 1}, row ${y + 1}`
                         : isExit
                           ? `Exit at column ${x + 1}, row ${y + 1}`
-                          : `Passage at column ${x + 1}, row ${y + 1}`
+                          : isMonster
+                            ? `${monster?.name ?? 'Monster'} at column ${x + 1}, row ${y + 1}`
+                            : `Passage at column ${x + 1}, row ${y + 1}`
                 }
                 key={`${x}-${y}`}
               >
@@ -71,10 +85,12 @@ function GameView({
                   <img className="adventurer-sprite" src={adventurerImage} alt="" />
                 ) : isWall ? (
                   <img className="wall-sprite" src={wallImage} alt="" />
+                ) : isMonster ? (
+                  <img className="monster-sprite" src={monsterImage} alt="" />
                 ) : isExit ? (
-                  'E'
+                  <img className="landmark-sprite" src={exitImage} alt="" />
                 ) : isEntrance ? (
-                  'I'
+                  <img className="landmark-sprite" src={entranceImage} alt="" />
                 ) : (
                   ''
                 )}
