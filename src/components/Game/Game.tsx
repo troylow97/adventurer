@@ -4,6 +4,7 @@ import { DungeonGenerator } from '../../services/DungeonGenerator'
 import { KeyboardInputHandler } from '../../services/KeyboardInputHandler'
 import { SeededRandom } from '../../services/SeededRandom'
 import GameView from './GameView'
+import { Health } from '../../models/Health'
 
 type GameProps = {
   seed?: number
@@ -23,7 +24,7 @@ function Game({ seed, opennessPercent, onBack }: GameProps) {
   useEffect(() => {
     const inputHandler = new KeyboardInputHandler((command) => {
       setLocation((currentLocation) => {
-        const adventurer = new Adventurer(currentLocation.clone())
+        const adventurer = new Adventurer(currentLocation.clone(), new Health(100))
         return world.move(adventurer, command) ? adventurer.location : currentLocation
       })
     })

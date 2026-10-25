@@ -34,7 +34,6 @@ function GameView({
   return (
     <section className="game-placeholder" aria-labelledby="game-title">
       <h2 id="game-title">Game</h2>
-      <p>Your game will appear here.</p>
       <p>Game seed: {seed}</p>
       <div
         className="game-grid"
